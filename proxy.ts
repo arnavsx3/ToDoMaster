@@ -1,6 +1,35 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import {
+  clerkMiddleware,
+  clerkClient,
+  createRouteMatcher,
+} from "@clerk/nextjs/server";
+import { NextResponse, NextRequest } from "next/server";
 
-export default clerkMiddleware();
+const isPublicRoute = createRouteMatcher([
+  "/",
+  "/sign-in(.*)",
+  "/sign-up(.*),",
+  "/api/webhook/register",
+]);
+
+export default clerkMiddleware(async (auth, req) => {
+  const proxyAuth = await auth();
+  const proxyClient = await clerkClient();
+  if (!isPublicRoute(req)) {
+    await auth.protect();
+  }
+  if (proxyAuth.userId) {
+    const user = await proxyClient.users.getUser(proxyAuth.userId);
+    const role = user.publicMetadata.role as string | undefined;
+
+    if (role === "admin" && req.nextUrl.pathname === "/dashboard") {
+      return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+    }
+    if (role !== "admin" && req.nextUrl.pathname.startsWith("/admin")) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+  }
+});
 
 export const config = {
   matcher: [
