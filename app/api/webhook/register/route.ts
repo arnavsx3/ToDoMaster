@@ -37,9 +37,9 @@ export async function POST(req: NextRequest) {
 
     if (evt.type === "user.created") {
       const { email_addresses, primary_email_address_id } = evt.data;
-      const primaryEmail = email_addresses.find((email) => {
-        email.id === primary_email_address_id;
-      });
+      const primaryEmail = email_addresses.find(
+        (email) => email.id === primary_email_address_id,
+      );
       if (!primaryEmail) {
         return NextResponse.json(
           { message: "No email address found" },
