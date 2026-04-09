@@ -1,22 +1,53 @@
 import { NextRequest, NextResponse } from "next/server";
-import { useAuth } from "@clerk/nextjs";
 import { prisma } from "@/lib/prisma";
-import { useParams } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 
 interface RouteContext {
-  params: {
-    id: string;
-  };
+  params: Promise<{id: string}>;
 }
 
-export async function DELETE(req: NextRequest, { params }: RouteContext) {
+export async function PATCH(req: NextRequest, { params }: RouteContext) {
   try {
-    const { userId } = useAuth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const todoID = params.id;
+    const { completed } = await req.json();
+    const {id:todoId} = await params;
+
+    const todo = await prisma.todo.findUnique({
+      where: { id: todoId },
+    });
+    if (!todo) {
+      return NextResponse.json({ error: "Todo not found" }, { status: 404 });
+    }
+    if (todo.userId !== userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const updatedTodo = await prisma.todo.update({
+      where: { id: todoId },
+      data: { completed },
+    });
+
+    return NextResponse.json({ updatedTodo }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest, { params }: RouteContext) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id: todoID } = await params;
     const todo = await prisma.todo.findUnique({
       where: { id: todoID },
     });
