@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
       {
         message: "User subscribed successfully",
         subscriptionEnds: updatedUser.subscriptionEnds,
+        isSubscribed: updatedUser.isSubscribed,
       },
       { status: 200 },
     );
