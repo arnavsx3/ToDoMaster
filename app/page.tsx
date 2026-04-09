@@ -37,6 +37,11 @@ export default function HomePage() {
           className="px-6 py-2 text-sm rounded-lg border hover:bg-gray-50">
           Sign in
         </Link>
+        <Link
+          href="/dashboard"
+          className="px-6 py-2 text-sm rounded-lg border hover:bg-gray-50">
+          Dashboard
+        </Link>
       </div>
 
       <div className="grid grid-cols-3 gap-3 text-left">
