@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Show } from "@clerk/nextjs";
 
 export default function HomePage() {
   return (
@@ -27,16 +28,18 @@ export default function HomePage() {
       </p>
 
       <div className="flex gap-2 justify-center mb-12">
-        <Link
-          href="/sign-up"
-          className="px-6 py-2 text-sm rounded-lg bg-black text-white hover:bg-gray-800">
-          Get started
-        </Link>
-        <Link
-          href="/sign-in"
-          className="px-6 py-2 text-sm rounded-lg border hover:bg-gray-50">
-          Sign in
-        </Link>
+        <Show when="signed-out">
+          <Link
+            href="/sign-up"
+            className="px-6 py-2 text-sm rounded-lg bg-black text-white hover:bg-gray-800">
+            Get started
+          </Link>
+          <Link
+            href="/sign-in"
+            className="px-6 py-2 text-sm rounded-lg border hover:bg-gray-50">
+            Sign in
+          </Link>
+        </Show>
         <Link
           href="/dashboard"
           className="px-6 py-2 text-sm rounded-lg border hover:bg-gray-50">
