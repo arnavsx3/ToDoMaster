@@ -5,6 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import { useCallback, useEffect, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 interface SubsData {
   isSubscribed: boolean;
@@ -22,6 +23,7 @@ export default function DashboardPage() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [newTodoTitle, setNewTodoTitle] = useState("");
   const [maxError, setMaxError] = useState("");
+  const router = useRouter();
 
   const fetchTodos = useCallback(
     async (page: number) => {
@@ -132,7 +134,20 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      {maxError && <div className="flex gap-2 mb-4">{maxError}</div>}
+      {maxError && (
+        <div className="flex gap-2 mb-4">
+          <span>{maxError}</span>
+          <span>
+            <button
+              onClick={() => {
+                router.push("/subscription");
+              }}
+              className="p-2 text-sm rounded-lg bg-black text-white hover:bg-gray-800 disabled:opacity-50">
+              Subscribe
+            </button>
+          </span>
+        </div>
+      )}
 
       <input
         type="text"
